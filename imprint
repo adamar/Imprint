@@ -1,6 +1,14 @@
 #!/bin/bash
 
 
+BASE="${HOME}/.ttyrec"
+TIMINGFILE="${BASE}/time.txt"
+SCRIPTFILE="${BASE}/record.txt"
+GIFTMP="${BASE}/gifs"
+OUTPUT="${HOME}/ttyrec.gif"
+
+
+
 init() {
 
   if [ ! -d "${BASE}" ]; then
@@ -27,6 +35,69 @@ play() {
   scriptreplay $TIMINGFILE $SCRIPTFILE
 
 }
+
+
+
+print() {
+
+  W=$WINDOWID
+ 
+  rm -rf $GIFTMP
+  mkdir $GIFTMP
+ 
+  t=$(mktemp)
+  cp $SCRIPTFILE $t
+ 
+  #remove first line
+  sed -i '1d' $t
+ 
+  #clear screen
+  clear
+
+  #read timing file one by one
+  curr=0
+  i=0
+  while read line
+  do
+    #capture time and chars to read
+    cols=($line)
+    chars=${cols[1]}
+ 
+    #read from current char the number of chars to read
+    dd if=$t bs=1 skip=$curr count=$chars 2>/dev/null
+ 
+    #convert to gif frame with a nice frame-number
+    n=$(printf "%010d" $i)
+    import -window $WINDOWID ${GIFTMP}/$n.gif
+ 
+    #and move to next position
+    curr=$((curr+chars))
+    i=$((i+1))
+  done <$TIMINGFILE
+  rm -f $t
+ 
+  #now, set gif with delay per frame
+  i=1
+  while read line
+  do
+    cols=($line)
+    timing=${cols[0]}
+    #get next image
+    file=$(ls -1 ${GIFTMP} | head -n $i | tail -n 1)
+    timing=$(echo "$timing*100" | bc -l | awk '{print int($0)}')
+    command=$command" -delay $timing ${GIFTMP}/$file"
+ 
+    i=$((i+1))
+  done < $TIMINGFILE
+ 
+  convert $command ${GIFTMP}/anim-notoptim.gif
+  convert ${GIFTMP}/anim-notoptim.gif -coalesce -layers Optimize $OUTPUT
+ 
+  rm -f ${GIFTMP}/anim-notoptim.gif
+  rm -rf  ${GIFTMP}
+
+}
+
 
 
 
