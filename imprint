@@ -1,0 +1,43 @@
+#!/bin/bash
+
+
+init() {
+
+  if [ ! -d "${BASE}" ]; then
+    mkdir ${BASE}
+  fi
+
+}
+
+
+msg(){
+  echo -e "\e[34m# ${1}\033[0m"
+}
+
+
+
+
+
+
+
+init
+
+case "$1" in
+  rec)
+        rec
+        ;;
+  play)
+        play
+        ;;
+  print)
+        print
+        ;;
+  *)
+        echo "Usage: $SELF rec|play|print"
+        echo ""
+        exit 1
+        ;;
+esac
+
+
+
