@@ -14,8 +14,19 @@ msg(){
   echo -e "\e[34m# ${1}\033[0m"
 }
 
+rec() {
+
+  init
+  script -t -a 2> $TIMINGFILE $SCRIPTFILE
+
+}
 
 
+play() {
+
+  scriptreplay $TIMINGFILE $SCRIPTFILE
+
+}
 
 
 
