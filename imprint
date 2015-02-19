@@ -24,21 +24,27 @@ msg(){
 
 rec() {
 
+  msg "Recording started ctrl-d to Stop"
   init
   script -t -a 2> $TIMINGFILE $SCRIPTFILE
+  msg "Recording Finished"
 
 }
 
 
 play() {
 
+  msg "Playing..."
   scriptreplay $TIMINGFILE $SCRIPTFILE
+  msg "fin"
 
 }
 
 
 
 print() {
+
+  msg "Printing to Gif file"
 
   W=$WINDOWID
  
